@@ -2215,9 +2215,22 @@ window.renderPortfolio = function() {
       </div>
 
       <div class="porto-info">
-        <span class="porto-info-item">Avg buy: <b>Rp ${fmt(Math.round(g.avgBuy))}</b></span>
-        <span class="porto-info-item"><b>${g.totalLot}</b> lot</span>
-        <span class="porto-info-item">Modal: <b>Rp ${fmt(Math.round(g.modal))}</b></span>
+        <div class="porto-info-row">
+          <div class="porto-info-cell">
+            <div class="porto-info-label">Avg Buy</div>
+            <div class="porto-info-val">Rp ${fmt(Math.round(g.avgBuy))}</div>
+          </div>
+          <div class="porto-info-divider"></div>
+          <div class="porto-info-cell">
+            <div class="porto-info-label">Lot</div>
+            <div class="porto-info-val">${g.totalLot}</div>
+          </div>
+          <div class="porto-info-divider"></div>
+          <div class="porto-info-cell">
+            <div class="porto-info-label">Modal</div>
+            <div class="porto-info-val">Rp ${fmt(Math.round(g.modal))}</div>
+          </div>
+        </div>
       </div>
 
       <div class="porto-price-section">
