@@ -955,6 +955,23 @@ function filterByDate(arr, filterVal) {
   // fallback: month key (YYYY-MM)
   return arr.filter(d => d.tgl && d.tgl.startsWith(filterVal));
 }
+
+window.onDateFilterChange = function(selectId, renderFn) {
+  const val = document.getElementById(selectId).value;
+  const customDiv = document.getElementById(selectId + '_custom');
+  if (customDiv) {
+    customDiv.className = 'custom-date-range' + (val === 'custom' ? ' show' : '');
+  }
+  if (val !== 'custom') {
+    if (typeof window[renderFn] === 'function') window[renderFn]();
+  }
+};
+
+window.applyCustomDate = function(selectId, renderFn) {
+  customDateFrom = document.getElementById(selectId + '_from').value;
+  customDateTo   = document.getElementById(selectId + '_to').value;
+  if (typeof window[renderFn] === 'function') window[renderFn]();
+};
 const daysBetween=(a,b)=>{if(!a||!b)return null;return Math.round((new Date(b)-new Date(a))/(1000*60*60*24));};
 
 function holdingDays(d){
