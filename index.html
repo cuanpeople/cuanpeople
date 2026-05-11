@@ -287,43 +287,60 @@ tr:hover td{background:#fafaf8}
   #bottomNav{display:none}
 }
 
-/* PORTFOLIO CARDS */
-.porto-card{background:#fff;border-radius:14px;border:1px solid #e8e8e3;padding:16px;margin-bottom:12px;position:relative}
+/* PORTFOLIO CARDS - COMPACT REDESIGN */
+.porto-summary{background:#fff;border-radius:12px;border:1px solid #e8e8e3;padding:12px 14px;margin-bottom:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.porto-empty{text-align:center;padding:3rem 1rem;color:#aaa}
+.porto-empty-icon{font-size:48px;margin-bottom:12px}
+
+.porto-card{background:#fff;border-radius:12px;border:1px solid #e8e8e3;margin-bottom:10px;overflow:hidden;transition:box-shadow .15s}
 .porto-card.floating-profit{border-left:4px solid #1D9E75}
 .porto-card.floating-loss{border-left:4px solid #E24B4A}
 .porto-card.floating-even{border-left:4px solid #f59e0b}
-.porto-card.no-price{border-left:4px solid #e8e8e3}
-.porto-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
-.porto-kode{font-size:20px;font-weight:700}
-.porto-nama{font-size:12px;color:#888;margin-top:2px}
-.porto-days{font-size:11px;padding:3px 9px;border-radius:99px;font-weight:600}
+.porto-card.no-price{border-left:4px solid #ddd}
+
+/* TOP ROW: kode + holding badge + edit btn */
+.porto-top{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 0}
+.porto-kode{font-size:17px;font-weight:700;color:#1a1a1a}
+.porto-nama{font-size:11px;color:#aaa;margin-left:6px;font-weight:400}
+.porto-top-right{display:flex;align-items:center;gap:6px}
+.porto-days{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600}
 .porto-days.fresh{background:#e8f5e9;color:#2e7d32}
 .porto-days.medium{background:#fff8e1;color:#e65100}
 .porto-days.long{background:#fdecea;color:#c62828}
-.porto-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
-.porto-stat{background:#fafaf8;border-radius:8px;padding:9px 10px}
-.porto-stat-label{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px}
-.porto-stat-value{font-size:14px;font-weight:700;color:#1a1a1a}
-.porto-price-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;background:#f5f5f0;border-radius:10px;padding:10px 12px}
-.porto-price-label{font-size:12px;color:#666;white-space:nowrap;font-weight:500}
-.porto-price-input{flex:1;border:1px solid #ddd;border-radius:8px;padding:7px 10px;font-size:14px;font-weight:700;font-family:inherit;outline:none;background:#fff;max-width:140px}
+.porto-edit-btn{background:none;border:none;cursor:pointer;font-size:13px;color:#bbb;padding:2px 6px;border-radius:6px}
+.porto-edit-btn:hover{background:#f5f5f0;color:#888}
+
+/* META ROW: avg buy · lot · modal */
+.porto-meta{display:flex;gap:0;padding:4px 14px 8px;flex-wrap:wrap;align-items:center}
+.porto-meta-item{font-size:12px;color:#888}
+.porto-meta-item b{color:#1a1a1a;font-weight:600}
+.porto-meta-sep{font-size:11px;color:#ddd;margin:0 6px}
+
+/* PRICE + FLOAT ROW */
+.porto-price-float{display:flex;align-items:center;gap:8px;padding:8px 14px;background:#fafaf8;border-top:1px solid #f0f0eb;border-bottom:1px solid #f0f0eb}
+.porto-price-label{font-size:11px;color:#888;white-space:nowrap}
+.porto-price-input{border:1px solid #ddd;border-radius:7px;padding:5px 8px;font-size:14px;font-weight:700;font-family:inherit;outline:none;background:#fff;width:110px;min-width:80px}
 .porto-price-input:focus{border-color:#1D9E75}
-.porto-floating{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:10px;margin-bottom:12px}
-.porto-floating.profit{background:#e8f5e9}
-.porto-floating.loss{background:#fdecea}
-.porto-floating.even{background:#fff8e1}
-.porto-floating.empty{background:#f5f5f0}
-.porto-floating-label{font-size:12px;font-weight:500}
-.porto-floating-val{font-size:16px;font-weight:700}
-.porto-rec{border-radius:10px;padding:10px 12px;font-size:12px;line-height:1.6;margin-bottom:10px}
-.porto-rec.buy{background:#e3f2fd;border-left:3px solid #1565c0;color:#1565c0}
-.porto-rec.hold{background:#e8f5e9;border-left:3px solid #2e7d32;color:#2e7d32}
-.porto-rec.consider-sell{background:#fff8e1;border-left:3px solid #e65100;color:#e65100}
-.porto-rec.sell{background:#fdecea;border-left:3px solid #c62828;color:#c62828}
-.porto-levels{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.porto-empty{text-align:center;padding:3rem 1rem;color:#aaa}
-.porto-empty-icon{font-size:48px;margin-bottom:12px}
-.porto-summary{background:#fff;border-radius:14px;border:1px solid #e8e8e3;padding:14px 16px;margin-bottom:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.porto-pct-badge{font-size:12px;font-weight:700;padding:3px 8px;border-radius:99px;white-space:nowrap}
+.porto-pct-badge.profit{background:#e8f5e9;color:#2e7d32}
+.porto-pct-badge.loss{background:#fdecea;color:#c62828}
+.porto-pct-badge.neutral{background:#f5f5f0;color:#888}
+.porto-float-val{margin-left:auto;font-size:15px;font-weight:700;white-space:nowrap}
+
+/* REC ROW */
+.porto-rec{padding:8px 14px;font-size:12px;line-height:1.55;display:flex;align-items:flex-start;gap:6px;cursor:pointer}
+.porto-rec.buy{background:#e3f2fd;color:#1565c0}
+.porto-rec.hold{background:#f0faf5;color:#0F6E56}
+.porto-rec.consider-sell{background:#fffde7;color:#e65100}
+.porto-rec.sell{background:#fff0f0;color:#c62828}
+.porto-rec-text{flex:1;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.porto-rec-text.expanded{-webkit-line-clamp:unset}
+.porto-rec-expand{font-size:11px;opacity:.7;white-space:nowrap;margin-top:1px;flex-shrink:0}
+
+/* BOTTOM: levels + hist stats */
+.porto-bottom{display:flex;align-items:center;gap:6px;padding:6px 14px 8px;flex-wrap:wrap}
+.porto-hist-tag{font-size:10px;color:#aaa;background:#f5f5f0;border-radius:99px;padding:2px 8px;white-space:nowrap}
+.porto-hist-tag b{color:#666}
 </style>
 </head>
 <body>
@@ -2152,9 +2169,9 @@ window.renderPortfolio = function() {
   const sorted = Object.entries(groups).sort((a,b)=>(b[1].holdDays||0)-(a[1].holdDays||0));
 
   const summaryHtml = `<div class="porto-summary">
-    <div class="stat-card" style="border:none;background:#fafaf8"><div class="stat-label">Posisi Hold</div><div class="stat-value">${Object.keys(groups).length} emiten</div></div>
-    <div class="stat-card" style="border:none;background:#fafaf8"><div class="stat-label">Total Modal</div><div class="stat-value" style="font-size:14px">Rp ${fmt(Math.round(totalModal))}</div></div>
-    <div class="stat-card" style="border:none;background:#fafaf8"><div class="stat-label">Floating P/L</div><div id="porto-total-floating" class="stat-value ${priceCount?(totalFloating>=0?'profit':'loss'):''}" style="font-size:14px">${priceCount?(totalFloating>=0?'+':'−')+'Rp '+fmt(Math.abs(Math.round(totalFloating))):'Masukkan harga'}</div></div>
+    <div class="stat-card" style="border:none;background:#fafaf8;padding:10px 12px"><div class="stat-label">Posisi Hold</div><div class="stat-value">${Object.keys(groups).length} emiten</div></div>
+    <div class="stat-card" style="border:none;background:#fafaf8;padding:10px 12px"><div class="stat-label">Total Modal</div><div class="stat-value" style="font-size:14px">Rp ${fmt(Math.round(totalModal))}</div></div>
+    <div class="stat-card" style="border:none;background:#fafaf8;padding:10px 12px"><div class="stat-label">Floating P/L</div><div id="porto-total-floating" class="stat-value ${priceCount?(totalFloating>=0?'profit':'loss'):''}" style="font-size:14px">${priceCount?(totalFloating>=0?'+':'−')+'Rp '+fmt(Math.abs(Math.round(totalFloating))):'—'}</div></div>
   </div>`;
 
   el.innerHTML = summaryHtml + sorted.map(([kode, g]) => {
@@ -2182,58 +2199,71 @@ window.renderPortfolio = function() {
 
     const h = g.hist;
 
+    const recIcon = {buy:'ℹ️', hold:'📈', 'consider-sell':'💰', sell:'🚨'}[recClass] || '💡';
+    const recShort = rec.replace(/<b>/g,'').replace(/<\/b>/g,'');
+
     return `<div class="porto-card ${floatClass}" id="porto-card-${kode}">
-      <div class="porto-header">
-        <div>
-          <div class="porto-kode">${kode}</div>
-          ${g.nama?`<div class="porto-nama">${g.nama}</div>`:''}
+      <div class="porto-top">
+        <div class="porto-left">
+          <span class="porto-kode">${kode}</span>
+          ${g.nama ? `<span class="porto-nama">${g.nama}</span>` : ''}
         </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-          <span class="porto-days ${hdClass}">⏱ ${hd!==null?hd+'h':'-'}</span>
-          <button class="action-btn" onclick="editEntry('${g.id}')" style="font-size:12px;padding:3px 8px;border:1px solid #ddd;border-radius:6px;color:#666">✏️ Edit</button>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="porto-days ${hdClass}">⏱ ${hd !== null ? hd + 'h' : '-'}</span>
+          <button class="porto-edit-btn" onclick="editEntry('${g.id}')" title="Edit">✏️</button>
         </div>
       </div>
 
-      <div class="porto-grid">
-        <div class="porto-stat"><div class="porto-stat-label">Avg Buy</div><div class="porto-stat-value">Rp ${fmt(Math.round(g.avgBuy))}</div></div>
-        <div class="porto-stat"><div class="porto-stat-label">Lot / Lembar</div><div class="porto-stat-value">${g.totalLot} / ${fmt(g.totalShares)}</div></div>
-        <div class="porto-stat"><div class="porto-stat-label">Modal</div><div class="porto-stat-value" style="font-size:12px">Rp ${fmt(Math.round(g.modal))}</div></div>
+      <div class="porto-info">
+        <span class="porto-info-item">Avg buy: <b>Rp ${fmt(Math.round(g.avgBuy))}</b></span>
+        <span class="porto-info-item"><b>${g.totalLot}</b> lot</span>
+        <span class="porto-info-item">Modal: <b>Rp ${fmt(Math.round(g.modal))}</b></span>
       </div>
 
-      <div class="porto-price-row">
-        <span class="porto-price-label">Harga sekarang:</span>
-        <input class="porto-price-input" type="number" placeholder="input harga..."
-          value="${cp||''}"
-          onblur="updatePortoPrice('${kode}',this.value)"
+      <div class="porto-price-section">
+        <span class="porto-price-label">Harga kini</span>
+        <input class="porto-price-input" type="number" placeholder="input..."
+          value="${cp || ''}"
+          onblur="updatePortoPrice('${kode}', this.value)"
           onkeydown="if(event.key==='Enter')this.blur()">
-        <span id="porto-pct-${kode}" style="font-size:12px;color:#888">${pl?(pl.pct>=0?'+':'')+pl.pct.toFixed(2)+'%':''}</span>
-      </div>
-
-      <div class="porto-floating ${floatBgClass}" id="porto-float-${kode}">
-        <span class="porto-floating-label">${pl?'Floating P/L (after fee)':'Belum ada harga'}</span>
-        <span class="porto-floating-val" style="color:${pl?(pl.rp>=0?'#1D9E75':'#E24B4A'):'#aaa'}">
-          ${pl?(pl.rp>=0?'+':'−')+'Rp '+fmt(Math.abs(Math.round(pl.rp))):'—'}
+        <span id="porto-pct-${kode}" class="porto-pct-badge ${pl ? (pl.pct >= 0 ? 'profit' : 'loss') : 'neutral'}">
+          ${pl ? (pl.pct >= 0 ? '+' : '') + pl.pct.toFixed(2) + '%' : '—'}
+        </span>
+        <span id="porto-float-${kode}" class="porto-float-val" style="color:${pl ? (pl.rp >= 0 ? '#1D9E75' : '#E24B4A') : '#bbb'}">
+          ${pl ? (pl.rp >= 0 ? '+' : '−') + 'Rp ' + fmt(Math.abs(Math.round(pl.rp))) : '—'}
         </span>
       </div>
 
-      <div class="porto-rec ${recClass}" id="porto-rec-${kode}">${rec}</div>
+      <div class="porto-rec-wrap">
+        <div class="porto-rec ${recClass}" id="porto-rec-${kode}">
+          <span class="porto-rec-icon">${recIcon}</span>
+          <div>
+            <div class="porto-rec-text collapsed" id="porto-rec-text-${kode}">${recShort}</div>
+            <div class="porto-rec-more show" id="porto-rec-more-${kode}" onclick="expandRec('${kode}')">Selengkapnya...</div>
+          </div>
+        </div>
+      </div>
 
-      ${sups.length||ress.length?`<div class="porto-levels">
-        ${sups.map(s=>`<span class="level support">S: ${s}</span>`).join('')}
-        ${ress.map(r=>`<span class="level resist">R: ${r}</span>`).join('')}
-      </div>`:''}
-
-      ${h.count?`<div style="margin-top:10px;padding-top:8px;border-top:1px solid #f0f0eb;font-size:11px;color:#aaa;display:flex;gap:12px;flex-wrap:wrap">
-        <span>Histori ${kode}: <b>${h.count}x</b> transaksi</span>
-        <span>Win rate: <b style="color:${h.wr>=50?'#1D9E75':'#E24B4A'}">${h.wr}%</b></span>
-        ${h.avgReturn!==null?`<span>Avg return: <b style="color:${h.avgReturn>=0?'#1D9E75':'#E24B4A'}">${h.avgReturn>=0?'+':''}${h.avgReturn.toFixed(1)}%</b></span>`:''}
-        ${h.avgProfit!==null?`<span>Avg profit: <b style="color:#1D9E75">+${h.avgProfit.toFixed(1)}%</b></span>`:''}
-        ${h.avgHold!==null?`<span>Avg hold: <b>${h.avgHold}h</b></span>`:''}
-      </div>`:''}
+      ${sups.length || ress.length || h.count ? `<div class="porto-bottom">
+        ${sups.map(s => `<span class="porto-level support">S ${s}</span>`).join('')}
+        ${ress.map(r => `<span class="porto-level resist">R ${r}</span>`).join('')}
+        ${h.count ? `<div class="porto-hist">
+          <span>WR: <b style="color:${h.wr >= 50 ? '#1D9E75' : '#E24B4A'}">${h.wr}%</b></span>
+          ${h.avgReturn !== null ? `<span>Avg: <b style="color:${h.avgReturn >= 0 ? '#1D9E75' : '#E24B4A'}">${h.avgReturn >= 0 ? '+' : ''}${h.avgReturn.toFixed(1)}%</b></span>` : ''}
+          <span>${h.count}x tx</span>
+        </div>` : ''}
+      </div>` : ''}
     </div>`;
   }).join('');
 };
 
+
+window.expandRec = function(kode) {
+  const txt = document.getElementById('porto-rec-text-' + kode);
+  const more = document.getElementById('porto-rec-more-' + kode);
+  if (txt) { txt.classList.remove('collapsed'); }
+  if (more) { more.style.display = 'none'; }
+};
 window.updatePortoPrice = function(kode, val) {
   const price = parseFloat(val);
   if (price > 0) portoPrices[kode] = price;
@@ -2273,19 +2303,22 @@ window.updatePortoCard = function(kode, curPrice) {
   card.className = 'porto-card ' + floatClass;
 
   const pctEl = document.getElementById('porto-pct-'+kode);
-  if (pctEl) pctEl.textContent = pl ? (pl.pct>=0?'+':'')+pl.pct.toFixed(2)+'%' : '';
+  if (pctEl) {
+    pctEl.textContent = pl ? (pl.pct>=0?'+':'')+pl.pct.toFixed(2)+'%' : '-%';
+    pctEl.className = 'porto-pct-badge ' + (pl?(pl.pct>=0?'profit':'loss'):'neutral');
+  }
 
   const floatEl = document.getElementById('porto-float-'+kode);
   if (floatEl) {
-    floatEl.className = 'porto-floating ' + floatBgClass;
-    floatEl.innerHTML = `<span class="porto-floating-label">${pl?'Floating P/L (after fee)':'Belum ada harga'}</span>
-      <span class="porto-floating-val" style="color:${pl?(pl.rp>=0?'#1D9E75':'#E24B4A'):'#aaa'}">
-        ${pl?(pl.rp>=0?'+':'−')+'Rp '+fmt(Math.abs(Math.round(pl.rp))):'—'}
-      </span>`;
+    floatEl.style.color = pl?(pl.rp>=0?'#1D9E75':'#E24B4A'):'#bbb';
+    floatEl.textContent = pl?(pl.rp>=0?'+':'−')+'Rp '+fmt(Math.abs(Math.round(pl.rp))):'—';
   }
 
   const recEl = document.getElementById('porto-rec-'+kode);
-  if (recEl) { recEl.className='porto-rec '+recClass; recEl.innerHTML=rec; }
+  if (recEl) {
+    recEl.className = 'porto-rec ' + recClass;
+    recEl.innerHTML = `<div class="porto-rec-text">${rec}</div>${rec.length>80?'<span class="porto-rec-expand">▼</span>':''}`;
+  }
 
   // Refresh summary total floating
   let totFloat=0, cnt=0;
