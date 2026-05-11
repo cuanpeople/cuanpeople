@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trading Journal — Cuan People</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f0; color: #1a1a1a; min-height: 100vh; }
+
+  /* LOGIN */
+  #loginPage { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1rem; }
+  .login-card { background: #fff; border-radius: 16px; border: 1px solid #e8e8e3; padding: 2.5rem; width: 100%; max-width: 380px; }
+  .login-logo { font-size: 28px; font-weight: 700; color: #1D9E75; margin-bottom: 4px; }
+  .login-sub { font-size: 13px; color: #888; margin-bottom: 2rem; }
+  .login-card label { display: block; font-size: 12px; font-weight: 500; color: #666; margin-bottom: 5px; }
+  .login-card input { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; margin-bottom: 1rem; outline: none; font-family: inherit; }
+  .login-card input:focus { border-color: #1D9E75; }
+  .btn-login { width: 100%; padding: 11px; background: #1D9E75; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; }
+  .btn-login:hover { background: #0F6E56; }
+  .login-error { background: #fff0f0; color: #c0392b; border-radius: 8px; padding: 10px 12px; font-size: 13px; margin-bottom: 1rem; display: none; }
+
+  /* APP */
+  #appPage { display: none; }
+  .topbar { background: #fff; border-bottom: 1px solid #e8e8e3; padding: 0 1.5rem; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .topbar-logo { font-size: 16px; font-weight: 700; color: #1D9E75; }
+  .topbar-user { font-size: 12px; color: #888; }
+  .btn-logout { padding: 6px 12px; font-size: 12px; border: 1px solid #ddd; border-radius: 6px; background: #fff; cursor: pointer; color: #666; }
+  .btn-logout:hover { background: #f5f5f0; }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+
+  /* STATS */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 1.5rem; }
+  .stat-card { background: #fff; border-radius: 12px; border: 1px solid #e8e8e3; padding: 14px 16px; }
+  .stat-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+  .stat-value { font-size: 22px; font-weight: 600; color: #1a1a1a; }
+  .stat-value.profit { color: #1D9E75; }
+  .stat-value.loss { color: #E24B4A; }
+
+  /* TOOLBAR */
+  .toolbar { display: flex; gap: 10px; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; }
+  .search-wrap { position: relative; flex: 1; min-width: 200px; }
+  .search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: #888; }
+  .search-wrap input { width: 100%; padding: 9px 10px 9px 32px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; outline: none; font-family: inherit; background: #fff; }
+  .search-wrap input:focus { border-color: #1D9E75; }
+  select { padding: 9px 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; background: #fff; outline: none; font-family: inherit; cursor: pointer; }
+  .btn { padding: 9px 14px; font-size: 13px; font-weight: 500; cursor: pointer; border-radius: 8px; border: 1px solid #ddd; background: #fff; color: #1a1a1a; display: inline-flex; align-items: center; gap: 6px; }
+  .btn:hover { background: #f5f5f0; }
+  .btn.primary { background: #1D9E75; border-color: #1D9E75; color: #fff; }
+  .btn.primary:hover { background: #0F6E56; }
+
+  /* TABLE */
+  .table-wrap { background: #fff; border-radius: 12px; border: 1px solid #e8e8e3; overflow: hidden; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 920px; }
+  th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 600; color: #888; background: #fafaf8; border-bottom: 1px solid #e8e8e3; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+  td { padding: 11px 14px; border-bottom: 1px solid #f0f0eb; color: #1a1a1a; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fafaf8; }
+  .emiten-code { font-weight: 600; font-size: 14px; }
+  .emiten-name { font-size: 11px; color: #888; margin-top: 2px; }
+  .badge { display: inline-block; padding: 3px 9px; border-radius: 99px; font-size: 11px; font-weight: 600; }
+  .badge.profit { background: #e8f5e9; color: #2e7d32; }
+  .badge.loss { background: #fdecea; color: #c62828; }
+  .badge.hold { background: #e3f2fd; color: #1565c0; }
+  .pct.profit { color: #1D9E75; font-weight: 600; }
+  .pct.loss { color: #E24B4A; font-weight: 600; }
+  .level-row { display: flex; gap: 4px; flex-wrap: wrap; }
+  .level { font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 500; }
+  .level.support { background: #e8f5e9; color: #2e7d32; }
+  .level.resist { background: #fdecea; color: #c62828; }
+  .action-btn { background: none; border: none; cursor: pointer; padding: 5px 7px; border-radius: 6px; color: #888; font-size: 15px; line-height: 1; }
+  .action-btn:hover { background: #f0f0eb; color: #1a1a1a; }
+  .empty-state { text-align: center; padding: 3rem 1rem; color: #aaa; }
+  .empty-state .icon { font-size: 36px; margin-bottom: 10px; }
+  .loading-state { text-align: center; padding: 3rem; color: #aaa; font-size: 13px; }
+
+  /* MODAL */
+  .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 100; align-items: center; justify-content: center; padding: 1rem; }
+  .modal-bg.open { display: flex; }
+  .modal { background: #fff; border-radius: 16px; padding: 1.75rem; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+  .modal-header h2 { font-size: 16px; font-weight: 600; }
+  .close-btn { background: none; border: none; cursor: pointer; font-size: 20px; color: #888; padding: 2px 6px; border-radius: 6px; line-height: 1; }
+  .close-btn:hover { background: #f0f0eb; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group.full { grid-column: 1 / -1; }
+  .form-group label { font-size: 12px; font-weight: 500; color: #666; }
+  .form-group input, .form-group textarea, .form-group select { padding: 9px 11px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; font-family: inherit; outline: none; }
+  .form-group input:focus, .form-group textarea:focus { border-color: #1D9E75; }
+  .form-group textarea { resize: vertical; min-height: 75px; }
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid #f0f0eb; }
+
+  /* DETAIL */
+  .detail-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 100; align-items: center; justify-content: center; padding: 1rem; }
+  .detail-bg.open { display: flex; }
+  .detail-panel { background: #fff; border-radius: 16px; padding: 1.75rem; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
+  .detail-panel h2 { font-size: 18px; font-weight: 700; margin-bottom: 2px; }
+  .detail-sub { font-size: 13px; color: #888; margin-bottom: 1.25rem; }
+  .detail-section { margin-bottom: 1rem; }
+  .detail-section-title { font-size: 11px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #f0f0eb; }
+  .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; font-size: 13px; border-bottom: 1px solid #f0f0eb; }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-row .dlabel { color: #888; }
+  .note-box { background: #fafaf8; border-radius: 8px; padding: 12px; font-size: 13px; line-height: 1.65; color: #444; }
+  .detail-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid #f0f0eb; }
+
+  @media (max-width: 600px) {
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .form-grid { grid-template-columns: 1fr; }
+    .form-group.full { grid-column: 1; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="loginPage">
+  <div class="login-card">
+    <div class="login-logo">📈 Cuan People</div>
+    <div class="login-sub">Trading Journal — masuk untuk melanjutkan</div>
+    <div class="login-error" id="loginError"></div>
+    <label>Email</label>
+    <input type="email" id="loginEmail" placeholder="email@kamu.com" autocomplete="email">
+    <label>Password</label>
+    <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+    <button class="btn-login" id="loginBtn" onclick="doLogin()">Masuk</button>
+  </div>
+</div>
+
+<!-- APP PAGE -->
+<div id="appPage">
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-logo">📈 Cuan People</span>
+      <span class="topbar-user" id="topbarUser"></span>
+    </div>
+    <button class="btn-logout" onclick="doLogout()">Keluar</button>
+  </div>
+
+  <div class="container">
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Total Emiten</div><div class="stat-value" id="statTotal">-</div></div>
+      <div class="stat-card"><div class="stat-label">Posisi Profit</div><div class="stat-value profit" id="statProfit">-</div></div>
+      <div class="stat-card"><div class="stat-label">Posisi Loss</div><div class="stat-value loss" id="statLoss">-</div></div>
+      <div class="stat-card"><div class="stat-label">Avg Return</div><div class="stat-value" id="statAvg">-</div></div>
+    </div>
+
+    <div class="toolbar">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="searchInput" placeholder="Cari kode atau nama emiten..." oninput="renderTable()">
+      </div>
+      <select id="filterStatus" onchange="renderTable()">
+        <option value="">Semua status</option>
+        <option value="profit">Profit</option>
+        <option value="loss">Loss</option>
+        <option value="hold">Hold</option>
+      </select>
+      <button class="btn primary" onclick="openModal()">+ Tambah Emiten</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Emiten</th>
+            <th>Buy (Rp)</th>
+            <th>Sell (Rp)</th>
+            <th>Status</th>
+            <th>Profit / Loss</th>
+            <th>Return</th>
+            <th>Support</th>
+            <th>Resistance</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr><td colspan="9"><div class="loading-state">Memuat data...</div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL TAMBAH/EDIT -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalTitle">Tambah Emiten</h2>
+      <button class="close-btn" onclick="closeModal()">×</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Kode Saham *</label>
+        <input type="text" id="f_kode" placeholder="BBCA" style="text-transform:uppercase">
+      </div>
+      <div class="form-group">
+        <label>Nama Emiten *</label>
+        <input type="text" id="f_nama" placeholder="Bank Central Asia Tbk">
+      </div>
+      <div class="form-group">
+        <label>Harga Buy (Rp) *</label>
+        <input type="number" id="f_buy" placeholder="9000">
+      </div>
+      <div class="form-group">
+        <label>Harga Sell (Rp)</label>
+        <input type="number" id="f_sell" placeholder="Kosongkan jika masih hold">
+      </div>
+      <div class="form-group">
+        <label>Lot</label>
+        <input type="number" id="f_lot" placeholder="10">
+      </div>
+      <div class="form-group">
+        <label>Tanggal Buy</label>
+        <input type="date" id="f_tgl">
+      </div>
+      <div class="form-group">
+        <label>Support (pisah koma)</label>
+        <input type="text" id="f_support" placeholder="8500, 8200, 7800">
+      </div>
+      <div class="form-group">
+        <label>Resistance (pisah koma)</label>
+        <input type="text" id="f_resist" placeholder="10000, 10500, 11000">
+      </div>
+      <div class="form-group full">
+        <label>Catatan / Tesis Trading</label>
+        <textarea id="f_catatan" placeholder="Alasan masuk, target price, cutloss, skenario re-entry, dll."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">Batal</button>
+      <button class="btn primary" id="saveBtn" onclick="saveEntry()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL PANEL -->
+<div class="detail-bg" id="detailBg">
+  <div class="detail-panel" id="detailContent"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBQ-3MZQ07opBINSyJqveuFKsE2by-RtIM",
+  authDomain: "cuan-people.firebaseapp.com",
+  projectId: "cuan-people",
+  storageBucket: "cuan-people.firebasestorage.app",
+  messagingSenderId: "283193508116",
+  appId: "1:283193508116:web:a8748f9ad3885720898201"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let data = [];
+let editId = null;
+let unsubscribe = null;
+
+function fmt(n) { return Number(n).toLocaleString('id-ID'); }
+
+function calcPL(buy, sell, lot) {
+  if (!sell || !buy) return null;
+  return { rp: (sell - buy) * lot * 100, pct: (sell - buy) / buy * 100 };
+}
+
+function updateStats() {
+  let profits = 0, losses = 0, sumPct = 0, counted = 0;
+  data.forEach(d => {
+    if (d.sell && d.buy) {
+      const pct = (d.sell - d.buy) / d.buy * 100;
+      pct >= 0 ? profits++ : losses++;
+      sumPct += pct; counted++;
+    }
+  });
+  document.getElementById('statTotal').textContent = data.length;
+  document.getElementById('statProfit').textContent = profits;
+  document.getElementById('statLoss').textContent = losses;
+  const avgEl = document.getElementById('statAvg');
+  if (counted) {
+    const avg = sumPct / counted;
+    avgEl.textContent = (avg >= 0 ? '+' : '') + avg.toFixed(2) + '%';
+    avgEl.className = 'stat-value ' + (avg >= 0 ? 'profit' : 'loss');
+  } else {
+    avgEl.textContent = '-';
+    avgEl.className = 'stat-value';
+  }
+}
+
+window.renderTable = function() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const fs = document.getElementById('filterStatus').value;
+  const filtered = data.filter(d => {
+    const mq = d.kode.toLowerCase().includes(q) || d.nama.toLowerCase().includes(q);
+    let ms = true;
+    if (fs === 'hold') ms = !d.sell;
+    else if (fs === 'profit') ms = d.sell && d.sell > d.buy;
+    else if (fs === 'loss') ms = d.sell && d.sell < d.buy;
+    return mq && ms;
+  });
+  const tbody = document.getElementById('tableBody');
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="icon">📭</div><div>Belum ada data. Tambah emiten pertama kamu!</div></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = filtered.map(d => {
+    const pl = d.sell ? calcPL(d.buy, d.sell, d.lot || 1) : null;
+    const status = !d.sell ? 'hold' : (d.sell >= d.buy ? 'profit' : 'loss');
+    const statusLabel = { hold: 'Hold', profit: 'Profit', loss: 'Loss' }[status];
+    const supports = (d.support||'').split(',').map(s=>s.trim()).filter(Boolean);
+    const resists = (d.resist||'').split(',').map(s=>s.trim()).filter(Boolean);
+    const supHTML = supports.slice(0,3).map(s=>`<span class="level support">${s}</span>`).join('') || '<span style="color:#bbb">-</span>';
+    const resHTML = resists.slice(0,3).map(s=>`<span class="level resist">${s}</span>`).join('') || '<span style="color:#bbb">-</span>';
+    return `<tr>
+      <td><div class="emiten-code">${d.kode}</div><div class="emiten-name">${d.nama}</div></td>
+      <td>Rp ${fmt(d.buy)}</td>
+      <td>${d.sell ? 'Rp '+fmt(d.sell) : '<span style="color:#bbb">-</span>'}</td>
+      <td><span class="badge ${status}">${statusLabel}</span></td>
+      <td>${pl ? `<span style="font-weight:600;color:${pl.rp>=0?'#1D9E75':'#E24B4A'}">${pl.rp>=0?'+':'−'}Rp ${fmt(Math.abs(pl.rp))}</span>` : '<span style="color:#bbb">-</span>'}</td>
+      <td>${pl ? `<span class="pct ${pl.pct>=0?'profit':'loss'}">${pl.pct>=0?'+':''}${pl.pct.toFixed(2)}%</span>` : '<span style="color:#bbb">-</span>'}</td>
+      <td><div class="level-row">${supHTML}</div></td>
+      <td><div class="level-row">${resHTML}</div></td>
+      <td style="white-space:nowrap">
+        <button class="action-btn" onclick="showDetail('${d.id}')" title="Detail">👁</button>
+        <button class="action-btn" onclick="editEntry('${d.id}')" title="Edit">✏️</button>
+        <button class="action-btn" onclick="deleteEntry('${d.id}')" title="Hapus">🗑</button>
+      </td>
+    </tr>`;
+  }).join('');
+  updateStats();
+};
+
+window.openModal = function(id = null) {
+  editId = id;
+  document.getElementById('modalTitle').textContent = id ? 'Edit Emiten' : 'Tambah Emiten';
+  const d = id ? data.find(x => x.id === id) : {};
+  document.getElementById('f_kode').value = d.kode || '';
+  document.getElementById('f_nama').value = d.nama || '';
+  document.getElementById('f_buy').value = d.buy || '';
+  document.getElementById('f_sell').value = d.sell || '';
+  document.getElementById('f_lot').value = d.lot || '';
+  document.getElementById('f_tgl').value = d.tgl || '';
+  document.getElementById('f_support').value = d.support || '';
+  document.getElementById('f_resist').value = d.resist || '';
+  document.getElementById('f_catatan').value = d.catatan || '';
+  document.getElementById('modalBg').classList.add('open');
+};
+
+window.closeModal = function() { document.getElementById('modalBg').classList.remove('open'); };
+
+window.saveEntry = async function() {
+  const kode = document.getElementById('f_kode').value.trim().toUpperCase();
+  const nama = document.getElementById('f_nama').value.trim();
+  const buy = parseFloat(document.getElementById('f_buy').value);
+  if (!kode || !nama || !buy) { alert('Kode saham, nama emiten, dan harga buy wajib diisi!'); return; }
+  const saveBtn = document.getElementById('saveBtn');
+  saveBtn.disabled = true; saveBtn.textContent = 'Menyimpan...';
+  const user = auth.currentUser;
+  const entry = {
+    uid: user.uid,
+    kode, nama, buy,
+    sell: parseFloat(document.getElementById('f_sell').value) || null,
+    lot: parseFloat(document.getElementById('f_lot').value) || 1,
+    tgl: document.getElementById('f_tgl').value,
+    support: document.getElementById('f_support').value.trim(),
+    resist: document.getElementById('f_resist').value.trim(),
+    catatan: document.getElementById('f_catatan').value.trim(),
+    updatedAt: new Date().toISOString()
+  };
+  try {
+    if (editId) {
+      await updateDoc(doc(db, 'trading_journal', editId), entry);
+    } else {
+      entry.createdAt = new Date().toISOString();
+      await addDoc(collection(db, 'trading_journal'), entry);
+    }
+    closeModal();
+  } catch(e) { alert('Gagal menyimpan: ' + e.message); }
+  saveBtn.disabled = false; saveBtn.textContent = 'Simpan';
+};
+
+window.editEntry = function(id) { openModal(id); };
+
+window.deleteEntry = async function(id) {
+  const d = data.find(x => x.id === id);
+  if (!confirm('Hapus ' + d.kode + ' dari jurnal?')) return;
+  try { await deleteDoc(doc(db, 'trading_journal', id)); }
+  catch(e) { alert('Gagal hapus: ' + e.message); }
+};
+
+window.showDetail = function(id) {
+  const d = data.find(x => x.id === id);
+  const pl = d.sell ? calcPL(d.buy, d.sell, d.lot||1) : null;
+  const status = !d.sell ? 'hold' : (d.sell >= d.buy ? 'profit' : 'loss');
+  const statusLabel = { hold:'Hold / Masih Pegang', profit:'Profit (Sudah Jual)', loss:'Loss (Sudah Jual)' }[status];
+  const supports = (d.support||'').split(',').map(s=>s.trim()).filter(Boolean);
+  const resists = (d.resist||'').split(',').map(s=>s.trim()).filter(Boolean);
+  document.getElementById('detailContent').innerHTML = `
+    <h2>${d.nama}</h2>
+    <div class="detail-sub">${d.kode} · ${d.tgl ? new Date(d.tgl).toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'}) : 'Tanggal tidak dicatat'}</div>
+    <div class="detail-section">
+      <div class="detail-section-title">Transaksi</div>
+      <div class="detail-row"><span class="dlabel">Harga Buy</span><span style="font-weight:600">Rp ${fmt(d.buy)}</span></div>
+      <div class="detail-row"><span class="dlabel">Harga Sell</span><span>${d.sell ? 'Rp '+fmt(d.sell) : '<span style="color:#bbb">Belum jual (Hold)</span>'}</span></div>
+      <div class="detail-row"><span class="dlabel">Lot</span><span>${d.lot||1} lot · ${((d.lot||1)*100).toLocaleString('id-ID')} lembar</span></div>
+      <div class="detail-row"><span class="dlabel">Modal</span><span>Rp ${fmt(d.buy*(d.lot||1)*100)}</span></div>
+      <div class="detail-row"><span class="dlabel">Status</span><span><span class="badge ${status}">${statusLabel}</span></span></div>
+      ${pl ? `
+      <div class="detail-row"><span class="dlabel">Profit / Loss</span><span style="font-weight:600;color:${pl.rp>=0?'#1D9E75':'#E24B4A'}">${pl.rp>=0?'+':'−'}Rp ${fmt(Math.abs(pl.rp))}</span></div>
+      <div class="detail-row"><span class="dlabel">Return</span><span class="pct ${pl.pct>=0?'profit':'loss'}">${pl.pct>=0?'+':''}${pl.pct.toFixed(2)}%</span></div>` : ''}
+    </div>
+    ${supports.length||resists.length ? `<div class="detail-section">
+      <div class="detail-section-title">Trade Plan</div>
+      ${supports.length ? `<div class="detail-row"><span class="dlabel">Support</span><span><div class="level-row" style="justify-content:flex-end">${supports.map(s=>`<span class="level support">${s}</span>`).join('')}</div></span></div>` : ''}
+      ${resists.length ? `<div class="detail-row"><span class="dlabel">Resistance</span><span><div class="level-row" style="justify-content:flex-end">${resists.map(r=>`<span class="level resist">${r}</span>`).join('')}</div></span></div>` : ''}
+    </div>` : ''}
+    ${d.catatan ? `<div class="detail-section">
+      <div class="detail-section-title">Catatan & Tesis Trading</div>
+      <div class="note-box">${d.catatan}</div>
+    </div>` : ''}
+    <div class="detail-footer">
+      <button class="btn" onclick="editEntry('${id}');document.getElementById('detailBg').classList.remove('open')">✏️ Edit</button>
+      <button class="btn primary" onclick="document.getElementById('detailBg').classList.remove('open')">Tutup</button>
+    </div>
+  `;
+  document.getElementById('detailBg').classList.add('open');
+};
+
+document.getElementById('modalBg').addEventListener('click', e => { if(e.target===document.getElementById('modalBg')) closeModal(); });
+document.getElementById('detailBg').addEventListener('click', e => { if(e.target===document.getElementById('detailBg')) document.getElementById('detailBg').classList.remove('open'); });
+
+window.doLogin = async function() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginError');
+  const btn = document.getElementById('loginBtn');
+  errEl.style.display = 'none';
+  btn.disabled = true; btn.textContent = 'Masuk...';
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch(e) {
+    errEl.textContent = 'Email atau password salah. Coba lagi.';
+    errEl.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'Masuk';
+  }
+};
+
+window.doLogout = async function() {
+  if (unsubscribe) unsubscribe();
+  await signOut(auth);
+};
+
+document.getElementById('loginPassword').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('appPage').style.display = 'block';
+    document.getElementById('topbarUser').textContent = user.email;
+    const q = query(
+      collection(db, 'trading_journal'),
+      orderBy('createdAt', 'desc')
+    );
+    unsubscribe = onSnapshot(q, snap => {
+      data = snap.docs
+        .map(d => ({ id: d.id, ...d.data() }))
+        .filter(d => d.uid === user.uid);
+      renderTable();
+    }, err => {
+      console.error(err);
+    });
+  } else {
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('appPage').style.display = 'none';
+    data = [];
+  }
+});
+</script>
+</body>
+</html>
