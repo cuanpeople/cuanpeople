@@ -477,7 +477,6 @@ tr:hover td{background:#fafaf8}
 .porto-pct-badge.profit{background:#e8f5e9;color:#2e7d32}
 .porto-pct-badge.loss{background:#fdecea;color:#c62828}
 .porto-pct-badge.neutral{background:#f5f5f0;color:#888}
-.porto-float-val{margin-left:auto;font-size:15px;font-weight:700;white-space:nowrap}
 
 /* REC ROW */
 .porto-rec{padding:8px 14px;font-size:12px;line-height:1.55;display:flex;align-items:flex-start;gap:6px;cursor:pointer}
@@ -2481,7 +2480,7 @@ window.updatePortoCard = function(kode, curPrice) {
     pctEl.className = 'porto-pct-badge ' + (pl?(pl.pct>=0?'profit':'loss'):'neutral');
   }
 
-  const floatEl = document.getElementById('porto-float-'+kode);
+  const floatEl = document.getElementById('porto-pl-'+kode);
   if (floatEl) {
     floatEl.style.color = pl?(pl.rp>=0?'#1D9E75':'#E24B4A'):'#bbb';
     floatEl.textContent = pl?(pl.rp>=0?'+':'−')+'Rp '+fmt(Math.abs(Math.round(pl.rp))):'—';
