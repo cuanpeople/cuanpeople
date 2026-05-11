@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trading Journal — Cuan People</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f0; color: #1a1a1a; min-height: 100vh; }
+#loginPage { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1rem; }
+.login-card { background: #fff; border-radius: 16px; border: 1px solid #e8e8e3; padding: 2.5rem; width: 100%; max-width: 380px; }
+.login-logo { font-size: 26px; font-weight: 700; color: #1D9E75; margin-bottom: 4px; }
+.login-sub { font-size: 13px; color: #888; margin-bottom: 2rem; }
+.login-card label { display: block; font-size: 12px; font-weight: 500; color: #666; margin-bottom: 5px; }
+.login-card input { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; margin-bottom: 1rem; outline: none; font-family: inherit; }
+.login-card input:focus { border-color: #1D9E75; }
+.btn-login { width: 100%; padding: 11px; background: #1D9E75; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; }
+.btn-login:hover { background: #0F6E56; }
+.login-error { background: #fff0f0; color: #c0392b; border-radius: 8px; padding: 10px 12px; font-size: 13px; margin-bottom: 1rem; display: none; }
+#appPage { display: none; }
+.topbar { background: #fff; border-bottom: 1px solid #e8e8e3; padding: 0 1.5rem; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.topbar-logo { font-size: 16px; font-weight: 700; color: #1D9E75; white-space: nowrap; }
+.topbar-nav { display: flex; gap: 2px; }
+.nav-btn { padding: 6px 13px; font-size: 13px; border-radius: 8px; border: none; background: none; cursor: pointer; color: #666; font-weight: 500; white-space: nowrap; }
+.nav-btn:hover { background: #f5f5f0; }
+.nav-btn.active { background: #f0faf5; color: #1D9E75; }
+.topbar-user { font-size: 12px; color: #888; white-space: nowrap; }
+.btn-logout { padding: 6px 12px; font-size: 12px; border: 1px solid #ddd; border-radius: 6px; background: #fff; cursor: pointer; color: #666; white-space: nowrap; }
+.btn-logout:hover { background: #f5f5f0; }
+.container { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+.page { display: none; }
+.page.active { display: block; }
+.stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 1.5rem; }
+.stat-card { background: #fff; border-radius: 12px; border: 1px solid #e8e8e3; padding: 14px 16px; }
+.stat-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+.stat-value { font-size: 18px; font-weight: 700; color: #1a1a1a; }
+.stat-value.profit { color: #1D9E75; }
+.stat-value.loss { color: #E24B4A; }
+.filter-bar { display: flex; gap: 8px; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; }
+.filter-bar label { font-size: 12px; font-weight: 500; color: #666; }
+.filter-bar select, select { padding: 8px 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; background: #fff; outline: none; font-family: inherit; cursor: pointer; }
+.toolbar { display: flex; gap: 10px; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; }
+.search-wrap { position: relative; flex: 1; min-width: 200px; }
+.search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: #888; pointer-events: none; }
+.search-wrap input { width: 100%; padding: 9px 10px 9px 32px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; outline: none; font-family: inherit; background: #fff; }
+.search-wrap input:focus { border-color: #1D9E75; }
+.btn { padding: 9px 14px; font-size: 13px; font-weight: 500; cursor: pointer; border-radius: 8px; border: 1px solid #ddd; background: #fff; color: #1a1a1a; display: inline-flex; align-items: center; gap: 6px; }
+.btn:hover { background: #f5f5f0; }
+.btn.primary { background: #1D9E75; border-color: #1D9E75; color: #fff; }
+.btn.primary:hover { background: #0F6E56; }
+.table-wrap { background: #fff; border-radius: 12px; border: 1px solid #e8e8e3; overflow: hidden; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 920px; }
+th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 600; color: #888; background: #fafaf8; border-bottom: 1px solid #e8e8e3; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+td { padding: 11px 14px; border-bottom: 1px solid #f0f0eb; color: #1a1a1a; vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #fafaf8; }
+.emiten-code { font-weight: 700; font-size: 14px; }
+.emiten-name { font-size: 11px; color: #888; margin-top: 2px; }
+.badge { display: inline-block; padding: 3px 9px; border-radius: 99px; font-size: 11px; font-weight: 600; }
+.badge.profit { background: #e8f5e9; color: #2e7d32; }
+.badge.loss { background: #fdecea; color: #c62828; }
+.badge.hold { background: #e3f2fd; color: #1565c0; }
+.pct.profit { color: #1D9E75; font-weight: 600; }
+.pct.loss { color: #E24B4A; font-weight: 600; }
+.level-row { display: flex; gap: 4px; flex-wrap: wrap; }
+.level { font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 500; }
+.level.support { background: #e8f5e9; color: #2e7d32; }
+.level.resist { background: #fdecea; color: #c62828; }
+.action-btn { background: none; border: none; cursor: pointer; padding: 5px 7px; border-radius: 6px; color: #888; font-size: 15px; line-height: 1; }
+.action-btn:hover { background: #f0f0eb; color: #1a1a1a; }
+.empty-state { text-align: center; padding: 3rem 1rem; color: #aaa; font-size: 14px; }
+.empty-icon { font-size: 36px; margin-bottom: 10px; }
+.loading-state { text-align: center; padding: 3rem; color: #aaa; font-size: 13px; }
+.dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 1.5rem; }
+.dash-card { background: #fff; border-radius: 12px; border: 1px solid #e8e8e3; padding: 16px 18px; }
+.dash-card-title { font-size: 12px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 14px; }
+.top-row { display: flex; align-items: center; gap: 8px; padding: 7px 4px; border-bottom: 1px solid #f0f0eb; cursor: pointer; border-radius: 6px; }
+.top-row:last-child { border-bottom: none; }
+.top-row:hover { background: #f5f5f0; }
+.top-rank { font-size: 12px; font-weight: 700; color: #ccc; width: 18px; text-align: center; flex-shrink: 0; }
+.top-rank.gold { color: #f59e0b; }
+.top-rank.silver { color: #94a3b8; }
+.top-rank.bronze { color: #b45309; }
+.top-kode { font-weight: 700; font-size: 13px; }
+.top-nama { font-size: 11px; color: #aaa; }
+.top-bar-wrap { flex: 1; height: 5px; background: #f0f0eb; border-radius: 3px; overflow: hidden; }
+.top-bar { height: 100%; border-radius: 3px; transition: width .3s; }
+.top-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 99px; flex-shrink: 0; }
+.summary-filter { display: flex; gap: 10px; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; }
+.summary-card { background: #fff; border-radius: 12px; border: 1px solid #e8e8e3; padding: 18px; margin-bottom: 12px; }
+.summary-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
+.summary-kode { font-size: 20px; font-weight: 700; }
+.summary-nama { font-size: 12px; color: #888; margin-top: 2px; }
+.summary-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+.sum-stat { background: #fafaf8; border-radius: 8px; padding: 10px 12px; }
+.sum-stat-label { font-size: 11px; color: #888; margin-bottom: 4px; }
+.sum-stat-value { font-size: 15px; font-weight: 700; }
+.sum-trades-title { font-size: 11px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; padding-top: 12px; border-top: 1px solid #f0f0eb; }
+.sum-trade-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #f0f0eb; font-size: 12px; flex-wrap: wrap; }
+.sum-trade-row:last-child { border-bottom: none; }
+.sum-date { color: #888; min-width: 85px; }
+.sum-pl { font-weight: 700; margin-left: auto; }
+.modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 100; align-items: center; justify-content: center; padding: 1rem; }
+.modal-bg.open { display: flex; }
+.modal { background: #fff; border-radius: 16px; padding: 1.75rem; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+.modal-header h2 { font-size: 16px; font-weight: 600; }
+.close-btn { background: none; border: none; cursor: pointer; font-size: 22px; color: #888; padding: 2px 6px; border-radius: 6px; line-height: 1; }
+.close-btn:hover { background: #f0f0eb; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group.full { grid-column: 1 / -1; }
+.form-group label { font-size: 12px; font-weight: 500; color: #666; }
+.form-group input, .form-group textarea { padding: 9px 11px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; font-family: inherit; outline: none; }
+.form-group input:focus, .form-group textarea:focus { border-color: #1D9E75; }
+.form-group textarea { resize: vertical; min-height: 75px; }
+.modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid #f0f0eb; }
+.detail-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 100; align-items: center; justify-content: center; padding: 1rem; }
+.detail-bg.open { display: flex; }
+.detail-panel { background: #fff; border-radius: 16px; padding: 1.75rem; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
+.detail-panel h2 { font-size: 18px; font-weight: 700; margin-bottom: 2px; }
+.detail-sub { font-size: 13px; color: #888; margin-bottom: 1.25rem; }
+.detail-section { margin-bottom: 1rem; }
+.detail-section-title { font-size: 11px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #f0f0eb; }
+.detail-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; font-size: 13px; border-bottom: 1px solid #f0f0eb; }
+.detail-row:last-child { border-bottom: none; }
+.dlabel { color: #888; }
+.note-box { background: #fafaf8; border-radius: 8px; padding: 12px; font-size: 13px; line-height: 1.65; color: #444; }
+.detail-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid #f0f0eb; }
+@media (max-width: 700px) {
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .dash-grid { grid-template-columns: 1fr; }
+  .summary-stats { grid-template-columns: repeat(2, 1fr); }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-group.full { grid-column: 1; }
+}
+</style>
+</head>
+<body>
+
+<div id="loginPage">
+  <div class="login-card">
+    <div class="login-logo">📈 Cuan People</div>
+    <div class="login-sub">Trading Journal — masuk untuk melanjutkan</div>
+    <div class="login-error" id="loginError"></div>
+    <label>Email</label>
+    <input type="email" id="loginEmail" placeholder="email@kamu.com" autocomplete="email">
+    <label>Password</label>
+    <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+    <button class="btn-login" id="loginBtn" onclick="doLogin()">Masuk</button>
+  </div>
+</div>
+
+<div id="appPage">
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-logo">📈 Cuan People</span>
+      <div class="topbar-nav">
+        <button class="nav-btn active" id="navJournal" onclick="showPage('journal',this)">Jurnal</button>
+        <button class="nav-btn" id="navDashboard" onclick="showPage('dashboard',this)">Dashboard</button>
+        <button class="nav-btn" id="navSummary" onclick="showPage('summary',this)">Per Emiten</button>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="topbar-user" id="topbarUser"></span>
+      <button class="btn-logout" onclick="doLogout()">Keluar</button>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- JURNAL -->
+    <div class="page active" id="pageJournal">
+      <div class="filter-bar">
+        <label>Bulan:</label>
+        <select id="monthFilter" onchange="renderJournal()"><option value="">Semua waktu</option></select>
+        <select id="filterStatus" onchange="renderJournal()">
+          <option value="">Semua status</option>
+          <option value="profit">Profit</option>
+          <option value="loss">Loss</option>
+          <option value="hold">Hold</option>
+        </select>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-label">Total Transaksi</div><div class="stat-value" id="statTotal">-</div></div>
+        <div class="stat-card"><div class="stat-label">Posisi Profit</div><div class="stat-value profit" id="statProfit">-</div></div>
+        <div class="stat-card"><div class="stat-label">Posisi Loss</div><div class="stat-value loss" id="statLoss">-</div></div>
+        <div class="stat-card"><div class="stat-label">Net P/L</div><div class="stat-value" id="statNet">-</div></div>
+        <div class="stat-card"><div class="stat-label">Avg Return</div><div class="stat-value" id="statAvg">-</div></div>
+      </div>
+      <div class="toolbar">
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="searchInput" placeholder="Cari kode atau nama emiten..." oninput="renderJournal()">
+        </div>
+        <button class="btn primary" onclick="openModal()">+ Tambah Transaksi</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Emiten</th><th>Tanggal</th><th>Buy (Rp)</th><th>Sell (Rp)</th>
+              <th>Status</th><th>Profit / Loss</th><th>Return</th>
+              <th>Support</th><th>Resistance</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"><tr><td colspan="10"><div class="loading-state">Memuat data...</div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="page" id="pageDashboard">
+      <div class="filter-bar">
+        <label>Bulan:</label>
+        <select id="dashMonth" onchange="renderDashboard()"><option value="">Semua waktu</option></select>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-label">Total Transaksi</div><div class="stat-value" id="dTotal">-</div></div>
+        <div class="stat-card"><div class="stat-label">Profit</div><div class="stat-value profit" id="dProfit">-</div></div>
+        <div class="stat-card"><div class="stat-label">Loss</div><div class="stat-value loss" id="dLoss">-</div></div>
+        <div class="stat-card"><div class="stat-label">Net P/L</div><div class="stat-value" id="dNet">-</div></div>
+        <div class="stat-card"><div class="stat-label">Win Rate</div><div class="stat-value" id="dWR">-</div></div>
+      </div>
+      <div class="dash-grid">
+        <div class="dash-card">
+          <div class="dash-card-title">🏆 Top 10 Emiten Terbanyak Transaksi</div>
+          <div id="topFreq"></div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-title">💰 Top 10 Emiten Net Profit Terbesar</div>
+          <div id="topProfit"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PER EMITEN -->
+    <div class="page" id="pageSummary">
+      <div class="summary-filter">
+        <div class="search-wrap" style="max-width:250px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="summarySearch" placeholder="Cari kode emiten..." oninput="renderSummary()">
+        </div>
+        <select id="summaryMonth" onchange="renderSummary()"><option value="">Semua waktu</option></select>
+      </div>
+      <div id="summaryList"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalTitle">Tambah Transaksi</h2>
+      <button class="close-btn" onclick="closeModal()">×</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label>Kode Saham *</label><input type="text" id="f_kode" placeholder="BBCA" style="text-transform:uppercase"></div>
+      <div class="form-group"><label>Nama Emiten (opsional)</label><input type="text" id="f_nama" placeholder="Bank Central Asia Tbk"></div>
+      <div class="form-group"><label>Harga Buy (Rp) *</label><input type="number" id="f_buy" placeholder="9000"></div>
+      <div class="form-group"><label>Harga Sell (Rp)</label><input type="number" id="f_sell" placeholder="Kosongkan jika masih hold"></div>
+      <div class="form-group"><label>Lot</label><input type="number" id="f_lot" placeholder="10"></div>
+      <div class="form-group"><label>Tanggal Buy</label><input type="date" id="f_tgl"></div>
+      <div class="form-group"><label>Support (pisah koma)</label><input type="text" id="f_support" placeholder="8500, 8200, 7800"></div>
+      <div class="form-group"><label>Resistance (pisah koma)</label><input type="text" id="f_resist" placeholder="10000, 10500"></div>
+      <div class="form-group full"><label>Catatan / Tesis Trading</label><textarea id="f_catatan" placeholder="Alasan masuk, target price, cutloss, skenario re-entry, dll."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">Batal</button>
+      <button class="btn primary" id="saveBtn" onclick="saveEntry()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL -->
+<div class="detail-bg" id="detailBg">
+  <div class="detail-panel" id="detailContent"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBQ-3MZQ07opBINSyJqveuFKsE2by-RtIM",
+  authDomain: "cuan-people.firebaseapp.com",
+  projectId: "cuan-people",
+  storageBucket: "cuan-people.firebasestorage.app",
+  messagingSenderId: "283193508116",
+  appId: "1:283193508116:web:a8748f9ad3885720898201"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let data = [];
+let editId = null;
+let unsubscribe = null;
+const MID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
+const fmt = n => Number(n).toLocaleString('id-ID');
+const fmtD = t => t ? new Date(t).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '-';
+const calcPL = (buy,sell,lot) => sell&&buy ? {rp:(sell-buy)*lot*100, pct:(sell-buy)/buy*100} : null;
+const monthKey = t => t ? t.slice(0,7) : null;
+const byMonth = (arr,mo) => mo ? arr.filter(d=>d.tgl&&d.tgl.startsWith(mo)) : arr;
+
+function fillMonths() {
+  const keys = [...new Set(data.map(d=>monthKey(d.tgl)).filter(Boolean))].sort().reverse();
+  const opts = '<option value="">Semua waktu</option>' + keys.map(k=>{const[y,m]=k.split('-');return`<option value="${k}">${MID[+m-1]} ${y}</option>`;}).join('');
+  ['monthFilter','dashMonth','summaryMonth'].forEach(id => {
+    const el = document.getElementById(id), cur = el.value;
+    el.innerHTML = opts;
+    if (keys.includes(cur)) el.value = cur;
+  });
+}
+
+window.showPage = function(page, btn) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page'+page.charAt(0).toUpperCase()+page.slice(1)).classList.add('active');
+  btn.classList.add('active');
+  if (page==='dashboard') renderDashboard();
+  if (page==='summary') renderSummary();
+};
+
+window.renderJournal = function() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const fs = document.getElementById('filterStatus').value;
+  const mo = document.getElementById('monthFilter').value;
+  let rows = byMonth(data,mo).filter(d=>{
+    const mq = d.kode.toLowerCase().includes(q)||(d.nama||'').toLowerCase().includes(q);
+    if (!mq) return false;
+    if (fs==='hold') return !d.sell;
+    if (fs==='profit') return d.sell&&d.sell>d.buy;
+    if (fs==='loss') return d.sell&&d.sell<d.buy;
+    return true;
+  });
+  let netPL=0,profits=0,losses=0,sumPct=0,counted=0;
+  rows.forEach(d=>{
+    if(d.sell&&d.buy){const pl=calcPL(d.buy,d.sell,d.lot||1);netPL+=pl.rp;sumPct+=pl.pct;counted++;pl.pct>=0?profits++:losses++;}
+  });
+  document.getElementById('statTotal').textContent=rows.length;
+  document.getElementById('statProfit').textContent=profits;
+  document.getElementById('statLoss').textContent=losses;
+  const ne=document.getElementById('statNet');
+  ne.textContent=(netPL>=0?'+':'−')+'Rp '+fmt(Math.abs(netPL));
+  ne.className='stat-value '+(netPL>=0?'profit':'loss');
+  const ae=document.getElementById('statAvg');
+  if(counted){ae.textContent=(sumPct/counted>=0?'+':'')+(sumPct/counted).toFixed(2)+'%';ae.className='stat-value '+(sumPct/counted>=0?'profit':'loss');}
+  else{ae.textContent='-';ae.className='stat-value';}
+  const tbody=document.getElementById('tableBody');
+  if(!rows.length){tbody.innerHTML='<tr><td colspan="10"><div class="empty-state"><div class="empty-icon">📭</div>Belum ada data.</div></td></tr>';return;}
+  tbody.innerHTML=rows.map(d=>{
+    const pl=d.sell?calcPL(d.buy,d.sell,d.lot||1):null;
+    const st=!d.sell?'hold':d.sell>=d.buy?'profit':'loss';
+    const sups=(d.support||'').split(',').map(s=>s.trim()).filter(Boolean);
+    const ress=(d.resist||'').split(',').map(s=>s.trim()).filter(Boolean);
+    return`<tr>
+      <td><div class="emiten-code">${d.kode}</div>${d.nama?`<div class="emiten-name">${d.nama}</div>`:''}</td>
+      <td style="color:#888;font-size:12px">${fmtD(d.tgl)}</td>
+      <td>Rp ${fmt(d.buy)}</td>
+      <td>${d.sell?'Rp '+fmt(d.sell):'<span style="color:#bbb">-</span>'}</td>
+      <td><span class="badge ${st}">${{hold:'Hold',profit:'Profit',loss:'Loss'}[st]}</span></td>
+      <td>${pl?`<span style="font-weight:700;color:${pl.rp>=0?'#1D9E75':'#E24B4A'}">${pl.rp>=0?'+':'−'}Rp ${fmt(Math.abs(pl.rp))}</span>`:'<span style="color:#bbb">-</span>'}</td>
+      <td>${pl?`<span class="pct ${pl.pct>=0?'profit':'loss'}">${pl.pct>=0?'+':''}${pl.pct.toFixed(2)}%</span>`:'<span style="color:#bbb">-</span>'}</td>
+      <td><div class="level-row">${sups.slice(0,3).map(s=>`<span class="level support">${s}</span>`).join('')||'<span style="color:#bbb">-</span>'}</div></td>
+      <td><div class="level-row">${ress.slice(0,3).map(r=>`<span class="level resist">${r}</span>`).join('')||'<span style="color:#bbb">-</span>'}</div></td>
+      <td style="white-space:nowrap">
+        <button class="action-btn" onclick="showDetail('${d.id}')">👁</button>
+        <button class="action-btn" onclick="editEntry('${d.id}')">✏️</button>
+        <button class="action-btn" onclick="deleteEntry('${d.id}')">🗑</button>
+      </td></tr>`;
+  }).join('');
+};
+
+window.renderDashboard = function() {
+  const mo=document.getElementById('dashMonth').value;
+  const rows=byMonth(data,mo);
+  let net=0,profits=0,losses=0,counted=0;
+  rows.forEach(d=>{if(d.sell&&d.buy){const pl=calcPL(d.buy,d.sell,d.lot||1);net+=pl.rp;counted++;pl.pct>=0?profits++:losses++;}});
+  document.getElementById('dTotal').textContent=rows.length;
+  document.getElementById('dProfit').textContent=profits;
+  document.getElementById('dLoss').textContent=losses;
+  const ne=document.getElementById('dNet');ne.textContent=(net>=0?'+':'−')+'Rp '+fmt(Math.abs(net));ne.className='stat-value '+(net>=0?'profit':'loss');
+  const we=document.getElementById('dWR');we.textContent=counted?Math.round(profits/counted*100)+'%':'-';we.className='stat-value '+(counted&&profits/counted>=0.5?'profit':'loss');
+
+  const freq={};
+  rows.forEach(d=>{
+    if(!freq[d.kode])freq[d.kode]={nama:d.nama||'',count:0,net:0};
+    freq[d.kode].count++;
+    if(d.sell&&d.buy){const pl=calcPL(d.buy,d.sell,d.lot||1);freq[d.kode].net+=pl.rp;}
+  });
+  const topF=Object.entries(freq).sort((a,b)=>b[1].count-a[1].count).slice(0,10);
+  const maxF=topF[0]?.[1]?.count||1;
+  document.getElementById('topFreq').innerHTML=topF.length?topF.map(([k,v],i)=>{
+    const rc=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+    return`<div class="top-row" onclick="goSummary('${k}')">
+      <span class="top-rank ${rc}">${i+1}</span>
+      <div style="min-width:0;flex:1"><div class="top-kode">${k}</div>${v.nama?`<div class="top-nama">${v.nama}</div>`:''}</div>
+      <div class="top-bar-wrap"><div class="top-bar" style="width:${v.count/maxF*100}%;background:#1D9E75"></div></div>
+      <span class="top-badge" style="background:#f0faf5;color:#1D9E75">${v.count}x</span>
+    </div>`;
+  }).join(''):'<div style="color:#aaa;font-size:13px;padding:8px 0">Belum ada data</div>';
+
+  const profMap={};
+  rows.forEach(d=>{if(d.sell&&d.buy){const pl=calcPL(d.buy,d.sell,d.lot||1);if(!profMap[d.kode])profMap[d.kode]={nama:d.nama||'',net:0};profMap[d.kode].net+=pl.rp;}});
+  const topP=Object.entries(profMap).sort((a,b)=>b[1].net-a[1].net).slice(0,10);
+  const maxP=Math.max(...topP.map(([,v])=>Math.abs(v.net)),1);
+  document.getElementById('topProfit').innerHTML=topP.length?topP.map(([k,v],i)=>{
+    const rc=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+    const pos=v.net>=0;
+    return`<div class="top-row" onclick="goSummary('${k}')">
+      <span class="top-rank ${rc}">${i+1}</span>
+      <div style="min-width:0;flex:1"><div class="top-kode">${k}</div>${v.nama?`<div class="top-nama">${v.nama}</div>`:''}</div>
+      <div class="top-bar-wrap"><div class="top-bar" style="width:${Math.abs(v.net)/maxP*100}%;background:${pos?'#1D9E75':'#E24B4A'}"></div></div>
+      <span class="top-badge" style="background:${pos?'#e8f5e9':'#fdecea'};color:${pos?'#2e7d32':'#c62828'}">${pos?'+':'−'}Rp ${fmt(Math.abs(v.net))}</span>
+    </div>`;
+  }).join(''):'<div style="color:#aaa;font-size:13px;padding:8px 0">Belum ada transaksi selesai</div>';
+};
+
+window.goSummary = function(kode) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('pageSummary').classList.add('active');
+  document.getElementById('navSummary').classList.add('active');
+  document.getElementById('summarySearch').value=kode;
+  renderSummary();
+};
+
+window.renderSummary = function() {
+  const q=document.getElementById('summarySearch').value.trim().toUpperCase();
+  const mo=document.getElementById('summaryMonth').value;
+  let rows=byMonth(data,mo);
+  if(q) rows=rows.filter(d=>d.kode.toUpperCase().includes(q));
+  const groups={};
+  rows.forEach(d=>{
+    if(!groups[d.kode])groups[d.kode]={nama:d.nama||'',trades:[]};
+    if(!groups[d.kode].nama&&d.nama)groups[d.kode].nama=d.nama;
+    groups[d.kode].trades.push(d);
+  });
+  const sorted=Object.entries(groups).sort((a,b)=>b[1].trades.length-a[1].trades.length);
+  const el=document.getElementById('summaryList');
+  if(!sorted.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">🔍</div>Tidak ditemukan.</div>';return;}
+  el.innerHTML=sorted.map(([kode,g])=>{
+    let net=0,profits=0,losses=0,holds=0;
+    g.trades.forEach(d=>{
+      if(!d.sell){holds++;return;}
+      const pl=calcPL(d.buy,d.sell,d.lot||1);
+      net+=pl.rp; pl.pct>=0?profits++:losses++;
+    });
+    const closed=profits+losses;
+    const wr=closed?Math.round(profits/closed*100):null;
+    const pos=net>=0;
+    return`<div class="summary-card">
+      <div class="summary-header">
+        <div><div class="summary-kode">${kode}</div>${g.nama?`<div class="summary-nama">${g.nama}</div>`:''}</div>
+        <span class="badge ${closed?(pos?'profit':'loss'):'hold'}">${closed?(pos?'Net Profit':'Net Loss'):'Semua Hold'}</span>
+      </div>
+      <div class="summary-stats">
+        <div class="sum-stat"><div class="sum-stat-label">Total Transaksi</div><div class="sum-stat-value">${g.trades.length}x</div></div>
+        <div class="sum-stat"><div class="sum-stat-label">Profit / Loss / Hold</div><div class="sum-stat-value"><span style="color:#1D9E75">${profits}</span> / <span style="color:#E24B4A">${losses}</span> / <span style="color:#1565c0">${holds}</span></div></div>
+        <div class="sum-stat"><div class="sum-stat-label">Win Rate</div><div class="sum-stat-value" style="color:${wr===null?'#888':wr>=50?'#1D9E75':'#E24B4A'}">${wr===null?'-':wr+'%'}</div></div>
+        <div class="sum-stat"><div class="sum-stat-label">Akumulasi P/L</div><div class="sum-stat-value" style="color:${closed?(pos?'#1D9E75':'#E24B4A'):'#888'}">${closed?(pos?'+':'−')+'Rp '+fmt(Math.abs(net)):'-'}</div></div>
+      </div>
+      <div class="sum-trades-title">Riwayat Transaksi</div>
+      ${g.trades.map(d=>{
+        const pl=d.sell?calcPL(d.buy,d.sell,d.lot||1):null;
+        const st=!d.sell?'hold':d.sell>=d.buy?'profit':'loss';
+        return`<div class="sum-trade-row">
+          <span class="sum-date">${fmtD(d.tgl)}</span>
+          <span>Buy: <b>Rp ${fmt(d.buy)}</b></span>
+          <span>${d.sell?'Sell: <b>Rp '+fmt(d.sell)+'</b>':'<span style="color:#1565c0">Hold</span>'}</span>
+          <span class="badge ${st}" style="font-size:10px">${{hold:'Hold',profit:'Profit',loss:'Loss'}[st]}</span>
+          <span class="sum-pl" style="color:${pl?(pl.rp>=0?'#1D9E75':'#E24B4A'):'#888'}">${pl?(pl.rp>=0?'+':'−')+'Rp '+fmt(Math.abs(pl.rp))+' ('+( pl.pct>=0?'+':'')+pl.pct.toFixed(1)+'%)':'-'}</span>
+          <button class="action-btn" onclick="showDetail('${d.id}')">👁</button>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+};
+
+window.openModal = function(id=null) {
+  editId=id;
+  document.getElementById('modalTitle').textContent=id?'Edit Transaksi':'Tambah Transaksi';
+  const d=id?data.find(x=>x.id===id):{};
+  ['kode','nama','buy','sell','lot','tgl','support','resist','catatan'].forEach(k=>document.getElementById('f_'+k).value=d[k]||'');
+  document.getElementById('modalBg').classList.add('open');
+};
+window.closeModal = () => document.getElementById('modalBg').classList.remove('open');
+
+window.saveEntry = async function() {
+  const kode=document.getElementById('f_kode').value.trim().toUpperCase();
+  const buy=parseFloat(document.getElementById('f_buy').value);
+  if(!kode||!buy){alert('Kode saham dan harga buy wajib diisi!');return;}
+  const btn=document.getElementById('saveBtn');
+  btn.disabled=true;btn.textContent='Menyimpan...';
+  const user=auth.currentUser;
+  const entry={
+    uid:user.uid,kode,
+    nama:document.getElementById('f_nama').value.trim(),
+    buy,sell:parseFloat(document.getElementById('f_sell').value)||null,
+    lot:parseFloat(document.getElementById('f_lot').value)||1,
+    tgl:document.getElementById('f_tgl').value,
+    support:document.getElementById('f_support').value.trim(),
+    resist:document.getElementById('f_resist').value.trim(),
+    catatan:document.getElementById('f_catatan').value.trim(),
+    updatedAt:new Date().toISOString()
+  };
+  try {
+    if(editId)await updateDoc(doc(db,'trading_journal',editId),entry);
+    else{entry.createdAt=new Date().toISOString();await addDoc(collection(db,'trading_journal'),entry);}
+    closeModal();
+  } catch(e){alert('Gagal: '+e.message);}
+  btn.disabled=false;btn.textContent='Simpan';
+};
+
+window.editEntry = id => openModal(id);
+window.deleteEntry = async function(id) {
+  const d=data.find(x=>x.id===id);
+  if(!confirm('Hapus transaksi '+d.kode+'?'))return;
+  try{await deleteDoc(doc(db,'trading_journal',id));}catch(e){alert('Gagal: '+e.message);}
+};
+
+window.showDetail = function(id) {
+  const d=data.find(x=>x.id===id);
+  const pl=d.sell?calcPL(d.buy,d.sell,d.lot||1):null;
+  const st=!d.sell?'hold':d.sell>=d.buy?'profit':'loss';
+  const stL={hold:'Hold / Masih Pegang',profit:'Profit (Sudah Jual)',loss:'Loss (Sudah Jual)'}[st];
+  const sups=(d.support||'').split(',').map(s=>s.trim()).filter(Boolean);
+  const ress=(d.resist||'').split(',').map(s=>s.trim()).filter(Boolean);
+  document.getElementById('detailContent').innerHTML=`
+    <h2>${d.nama||d.kode}</h2>
+    <div class="detail-sub">${d.kode} · ${fmtD(d.tgl)}</div>
+    <div class="detail-section">
+      <div class="detail-section-title">Transaksi</div>
+      <div class="detail-row"><span class="dlabel">Harga Buy</span><span style="font-weight:700">Rp ${fmt(d.buy)}</span></div>
+      <div class="detail-row"><span class="dlabel">Harga Sell</span><span>${d.sell?'Rp '+fmt(d.sell):'<span style="color:#bbb">Belum jual</span>'}</span></div>
+      <div class="detail-row"><span class="dlabel">Lot</span><span>${d.lot||1} lot · ${((d.lot||1)*100).toLocaleString('id-ID')} lembar</span></div>
+      <div class="detail-row"><span class="dlabel">Modal</span><span>Rp ${fmt(d.buy*(d.lot||1)*100)}</span></div>
+      <div class="detail-row"><span class="dlabel">Status</span><span><span class="badge ${st}">${stL}</span></span></div>
+      ${pl?`<div class="detail-row"><span class="dlabel">Profit / Loss</span><span style="font-weight:700;color:${pl.rp>=0?'#1D9E75':'#E24B4A'}">${pl.rp>=0?'+':'−'}Rp ${fmt(Math.abs(pl.rp))}</span></div>
+      <div class="detail-row"><span class="dlabel">Return</span><span class="pct ${pl.pct>=0?'profit':'loss'}">${pl.pct>=0?'+':''}${pl.pct.toFixed(2)}%</span></div>`:''}
+    </div>
+    ${sups.length||ress.length?`<div class="detail-section">
+      <div class="detail-section-title">Trade Plan</div>
+      ${sups.length?`<div class="detail-row"><span class="dlabel">Support</span><span><div class="level-row" style="justify-content:flex-end">${sups.map(s=>`<span class="level support">${s}</span>`).join('')}</div></span></div>`:''}
+      ${ress.length?`<div class="detail-row"><span class="dlabel">Resistance</span><span><div class="level-row" style="justify-content:flex-end">${ress.map(r=>`<span class="level resist">${r}</span>`).join('')}</div></span></div>`:''}
+    </div>`:''}
+    ${d.catatan?`<div class="detail-section"><div class="detail-section-title">Catatan & Tesis Trading</div><div class="note-box">${d.catatan}</div></div>`:''}
+    <div class="detail-footer">
+      <button class="btn" onclick="editEntry('${id}');document.getElementById('detailBg').classList.remove('open')">✏️ Edit</button>
+      <button class="btn primary" onclick="document.getElementById('detailBg').classList.remove('open')">Tutup</button>
+    </div>`;
+  document.getElementById('detailBg').classList.add('open');
+};
+
+document.getElementById('modalBg').addEventListener('click',e=>{if(e.target===document.getElementById('modalBg'))closeModal();});
+document.getElementById('detailBg').addEventListener('click',e=>{if(e.target===document.getElementById('detailBg'))document.getElementById('detailBg').classList.remove('open');});
+
+window.doLogin = async function() {
+  const email=document.getElementById('loginEmail').value.trim();
+  const pass=document.getElementById('loginPassword').value;
+  const err=document.getElementById('loginError');
+  const btn=document.getElementById('loginBtn');
+  err.style.display='none';btn.disabled=true;btn.textContent='Masuk...';
+  try{await signInWithEmailAndPassword(auth,email,pass);}
+  catch(e){err.textContent='Email atau password salah.';err.style.display='block';btn.disabled=false;btn.textContent='Masuk';}
+};
+window.doLogout = async function(){if(unsubscribe)unsubscribe();await signOut(auth);};
+document.getElementById('loginPassword').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+
+onAuthStateChanged(auth, user => {
+  if(user){
+    document.getElementById('loginPage').style.display='none';
+    document.getElementById('appPage').style.display='block';
+    document.getElementById('topbarUser').textContent=user.email;
+    const q=query(collection(db,'trading_journal'),orderBy('createdAt','desc'));
+    unsubscribe=onSnapshot(q,snap=>{
+      data=snap.docs.map(d=>({id:d.id,...d.data()})).filter(d=>d.uid===user.uid);
+      fillMonths();
+      renderJournal();
+    });
+  } else {
+    document.getElementById('loginPage').style.display='flex';
+    document.getElementById('appPage').style.display='none';
+    data=[];
+  }
+});
+</script>
+</body>
+</html>
