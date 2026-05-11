@@ -915,34 +915,43 @@ const byMonth=(arr,mo)=>mo?arr.filter(d=>d.tgl&&d.tgl.startsWith(mo)):arr;
 let customDateFrom = '', customDateTo = '';
 function filterByDate(arr, filterVal) {
   if (!filterVal) return arr;
-  const today = new Date(); today.setHours(0,0,0,0);
-  const todayStr = today.toISOString().slice(0,10);
+
+  // Gunakan local date (bukan UTC) agar cocok dengan timezone Indonesia
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  const localStr = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  const localMon = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}`;
+
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const todayStr = localStr(today);
 
   if (filterVal === 'today') {
     return arr.filter(d => d.tgl === todayStr);
   }
   if (filterVal === 'yesterday') {
     const y = new Date(today); y.setDate(y.getDate()-1);
-    const yStr = y.toISOString().slice(0,10);
-    return arr.filter(d => d.tgl === yStr);
+    return arr.filter(d => d.tgl === localStr(y));
   }
   if (filterVal === 'this_week') {
-    const start = new Date(today); start.setDate(today.getDate() - today.getDay() + (today.getDay()===0?-6:1));
-    return arr.filter(d => d.tgl && d.tgl >= start.toISOString().slice(0,10));
+    const dow = today.getDay(); // 0=Minggu
+    const diffToMon = dow === 0 ? -6 : 1 - dow;
+    const start = new Date(today); start.setDate(today.getDate() + diffToMon);
+    return arr.filter(d => d.tgl && d.tgl >= localStr(start) && d.tgl <= todayStr);
   }
   if (filterVal === 'last_week') {
-    const startW = new Date(today); startW.setDate(today.getDate() - today.getDay() - 6);
-    const endW = new Date(today); endW.setDate(today.getDate() - today.getDay());
-    return arr.filter(d => d.tgl && d.tgl >= startW.toISOString().slice(0,10) && d.tgl <= endW.toISOString().slice(0,10));
+    const dow = today.getDay();
+    const diffToMon = dow === 0 ? -6 : 1 - dow;
+    const thisMonday = new Date(today); thisMonday.setDate(today.getDate() + diffToMon);
+    const lastMon = new Date(thisMonday); lastMon.setDate(thisMonday.getDate()-7);
+    const lastSun = new Date(thisMonday); lastSun.setDate(thisMonday.getDate()-1);
+    return arr.filter(d => d.tgl && d.tgl >= localStr(lastMon) && d.tgl <= localStr(lastSun));
   }
   if (filterVal === 'this_month') {
-    const mk = todayStr.slice(0,7);
-    return arr.filter(d => d.tgl && d.tgl.startsWith(mk));
+    return arr.filter(d => d.tgl && d.tgl.startsWith(localMon(today)));
   }
   if (filterVal === 'last_month') {
-    const d = new Date(today.getFullYear(), today.getMonth()-1, 1);
-    const mk = d.toISOString().slice(0,7);
-    return arr.filter(d => d.tgl && d.tgl.startsWith(mk));
+    const lm = new Date(today.getFullYear(), today.getMonth()-1, 1);
+    return arr.filter(d => d.tgl && d.tgl.startsWith(localMon(lm)));
   }
   if (filterVal === 'custom') {
     return arr.filter(d => {
